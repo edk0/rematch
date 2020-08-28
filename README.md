@@ -1,6 +1,6 @@
 # rematch
 
-```
+```pycon
 >>> from rematch import Re, Match, Group
 >>> match Re("hello edk"):
 ...   case Match(r"hello (.*)", Group(whom)):
