@@ -1,3 +1,4 @@
+from functools import lru_cache
 import re as python_re
 
 
@@ -36,6 +37,11 @@ class Group(metaclass=GroupType):
     pass
 
 G=Group
+
+
+@lru_cache(maxsize=None)
+def _re_compile(pattern):
+    return python_re.compile(pattern)
 
 
 class MatchType(type):
@@ -77,9 +83,11 @@ class Re:
 
     def _bind(self, kind, pattern):
         if kind == 'match':
-            m = python_re.match(pattern, self._s)
+            m = _re_compile(pattern).match(self._s)
         elif kind == 'search':
-            m = python_re.search(pattern, self._s)
+            m = _re_compile(pattern).search(self._s)
+        elif kind == 'fullmatch':
+            m = _re_compile(pattern).fullmatch(self._s)
         else:
             assert False
         if not m:
