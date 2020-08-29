@@ -44,42 +44,36 @@ def _re_compile(pattern):
     return python_re.compile(pattern)
 
 
-class MatchType(type):
-    __match_args__ = (
-        '_rematch_bind_match_',
-        *(f"_rematch_item_{k}" for k in range(1, 1000))
-    )
+def _build_matcher(name, kind):
+    class MetaMatcher(type):
+        __match_args__ = (
+            f'_rematch_bind_{kind}',
+            *(f"_rematch_item_{k}" for k in range(1, 1000))
+        )
 
-    def __instancecheck__(self, instance):
-        return super().__instancecheck__(instance) or isinstance(instance, Re)
+        def __instancecheck__(self, instance):
+            return super().__instancecheck__(instance) or isinstance(instance, Re)
 
+        def __call__(self, *a, **kw):
+            raise TypeError("You don't want to do that")
+    MetaMatcher.__name__ = f"{name}Type"
 
-class Match(metaclass=MatchType):
-    pass
+    class Matcher(metaclass=MetaMatcher):
+        pass
+    Matcher.__name__ = name
 
-
-class SearchType(type):
-    __match_args__ = (
-        '_rematch_bind_search_',
-        *(f"_rematch_item_{k}" for k in range(1, 1000))
-    )
-
-    def __instancecheck__(self, instance):
-        return super().__instancecheck__(instance) or isinstance(instance, Re)
+    return Matcher
 
 
-class Search(metaclass=MatchType):
-    pass
+Match = _build_matcher('Match', 'match')
+Search = _build_matcher('Search', 'search')
+FullMatch = _build_matcher('FullMatch', 'fullmatch')
 
 
 class Re:
     def __init__(self, s):
         self._s = s
         self._rematch_match_ = None
-
-    @property
-    def _rematch_bind_match_(self):
-        return ReBinder('match', self)
 
     def _bind(self, kind, pattern):
         if kind == 'match':
@@ -96,6 +90,9 @@ class Re:
         return True
 
     def __getattr__(self, k):
+        if k.startswith('_rematch_bind_'):
+            kind = k.removeprefix('_rematch_bind_')
+            return ReBinder(kind, self)
         if k.startswith('_rematch_item_'):
             k = int(k.removeprefix('_rematch_item_'))
         return ReGroup(self, k)
