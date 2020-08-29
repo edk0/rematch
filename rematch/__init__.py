@@ -32,6 +32,9 @@ class GroupType(type):
     def __instancecheck__(self, instance):
         return isinstance(instance, ReGroup)
 
+    def __call__(self, *a, **kw):
+            raise TypeError("You don't want to do that")
+
 
 class Group(metaclass=GroupType):
     pass
