@@ -36,7 +36,7 @@ class GroupType(type):
 class Group(metaclass=GroupType):
     pass
 
-G=Group
+G = Group
 
 
 @lru_cache(maxsize=None)
