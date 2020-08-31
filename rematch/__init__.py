@@ -2,7 +2,7 @@ from functools import lru_cache
 import re as python_re
 
 
-__all__ = ['Re', 'Match', 'Search', 'Group', 'G']
+__all__ = ['Re', 'Match', 'Search', 'FullMatch', 'Sub', 'Group', 'G', 'Text', 'Num', 'N']
 
 
 class ReBinder:
