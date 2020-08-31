@@ -121,7 +121,7 @@ def _build_sub(name, kind):
         __match_args__ = (
             f"_rematch_bind_{kind}",
             "_rematch_repl_",
-            *("_rematch_sub_result_" for _ in range(1, 1000))
+            *("_rematch_sub_result_" for _ in range(2))
         )
 
         def __instancecheck__(self, instance):
