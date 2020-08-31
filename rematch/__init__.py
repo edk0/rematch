@@ -88,58 +88,37 @@ def _re_compile(pattern):
     return python_re.compile(pattern)
 
 
-def _build_matcher(name, kind):
-    class MetaMatcher(type):
-        __match_args__ = (
-            f"_rematch_bind_{kind}",
-            *(f"_rematch_item_{k}" for k in range(1, 1000))
-        )
+class MatcherType(type):
+    def __new__(metacls, name, bases, namespace, kind):
+        cls = type.__new__(metacls, name, bases, namespace)
+        if '__match_args__' not in namespace:
+            cls.__match_args__ = (
+                f"_rematch_bind_{kind}",
+                *(f"_rematch_item_{k}" for k in range(1, 1000))
+            )
+        return cls
 
-        def __instancecheck__(self, instance):
-            return super().__instancecheck__(instance) or isinstance(instance, Re)
+    def __instancecheck__(self, instance):
+        return super().__instancecheck__(instance) or isinstance(instance, Re)
 
-        def __call__(self, *a, **kw):
-            raise TypeError("You don't want to do that")
-
-    MetaMatcher.__qualname__ = MetaMatcher.__name__ = f"{name}Type"
-
-    class Matcher(metaclass=MetaMatcher):
-        pass
-
-    Matcher.__qualname__ = Matcher.__name__ = name
-
-    return Matcher
+    def __call__(self, *a, **kw):
+        raise TypeError("You don't want to do that")
 
 
-Match = _build_matcher('Match', 'match')
-Search = _build_matcher('Search', 'search')
-FullMatch = _build_matcher('FullMatch', 'fullmatch')
+class Match(metaclass=MatcherType, kind='match'):
+    pass
+class Search(metaclass=MatcherType, kind='search'):
+    pass
+class FullMatch(metaclass=MatcherType, kind='fullmatch'):
+    pass
 
 
-def _build_sub(name, kind):
-    class MetaMatcher(type):
-        __match_args__ = (
-            f"_rematch_bind_{kind}",
-            "_rematch_repl_",
-            *("_rematch_sub_result_" for _ in range(2))
-        )
-
-        def __instancecheck__(self, instance):
-            return super().__instancecheck__(instance) or isinstance(instance, Re)
-
-    MetaMatcher.__name__ = f"{name}Type"
-    MetaMatcher.__qualname__ = f"{__name__}.{MetaMatcher.__name__}"
-
-    class Matcher(metaclass=MetaMatcher):
-        pass
-
-    Matcher.__name__ = name
-    Matcher.__qualname__ = f"{__name__}.{Matcher.__name__}"
-
-    return Matcher
-
-
-Sub = _build_sub('Sub', 'sub')
+class Sub(metaclass=MatcherType, kind='sub'):
+    __match_args__ = (
+        f"_rematch_bind_sub",
+        "_rematch_repl_",
+        *("_rematch_sub_result_" for _ in range(2))
+    )
 
 
 class Re:
