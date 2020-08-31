@@ -100,11 +100,13 @@ def _build_matcher(name, kind):
 
         def __call__(self, *a, **kw):
             raise TypeError("You don't want to do that")
-    MetaMatcher.__name__ = f"{name}Type"
+
+    MetaMatcher.__qualname__ = MetaMatcher.__name__ = f"{name}Type"
 
     class Matcher(metaclass=MetaMatcher):
         pass
-    Matcher.__name__ = name
+
+    Matcher.__qualname__ = Matcher.__name__ = name
 
     return Matcher
 
