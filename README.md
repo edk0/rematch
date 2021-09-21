@@ -1,6 +1,6 @@
 # rematch
 
-A hack to use [PEP 622][pep-622] to match regexps:
+A hack to use [PEP 634][pep-634] to match regexps:
 
 ```pycon
 >>> from rematch import Re, Match, Group
@@ -27,4 +27,4 @@ goodbye edk
 
 You can also save the number of substitutions in `n` with `Num(n)`.
 
-[pep-622]: https://www.python.org/dev/peps/pep-0622/
+[pep-634]: https://www.python.org/dev/peps/pep-0634/
