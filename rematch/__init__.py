@@ -11,7 +11,7 @@ class ReBinder:
         self._re = re
 
     def __eq__(self, other):
-        if not isinstance(other, str):
+        if not isinstance(other, (str, python_re.Pattern)):
             raise TypeError
         return self._re._bind(self._kind, other)
 
@@ -85,6 +85,8 @@ class Num(metaclass=GetterType, key='_rematch_sub_n_', class_=ReSub):
 
 @lru_cache(maxsize=None)
 def _re_compile(pattern):
+    if isinstance(pattern, python_re.Pattern):
+        return pattern
     return python_re.compile(pattern)
 
 
