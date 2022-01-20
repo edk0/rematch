@@ -82,6 +82,8 @@ class Text(metaclass=GetterType, key='_rematch_sub_text_', class_=ReSub):
 class Num(metaclass=GetterType, key='_rematch_sub_n_', class_=ReSub):
     pass
 
+N = Num
+
 
 @lru_cache(maxsize=None)
 def _re_compile(pattern):
